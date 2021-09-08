@@ -9,5 +9,5 @@ PW Application Client
 ### Installation
 ```shell
 $ yarn
-$ yarn start
+$ yarn start or yarn build
 ```
