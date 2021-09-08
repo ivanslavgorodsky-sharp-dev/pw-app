@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,500,600,700,800');
+
+body {
+  min-height: 100vh;
+  display: flex;
+  font-weight: 400;
+  font-family: 'Fira Sans', sans-serif;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.content {
+  border: 1px dotted #ccc;
+  border-radius: 5px;
+  padding: 1em;
+  width: 90%;
+}
