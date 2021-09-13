@@ -65,7 +65,7 @@ const NewTransaction = (props: TransactionProps) => {
                     })}
                 </datalist>
                 <input
-                    name="amount" type="number" step="0.01" autoComplete="off" value={values.amount}
+                    name="amount" type="number" min="0.01" step="0.01" autoComplete="off" value={values.amount}
                     className="form-control" placeholder="Amount" required onChange={handleChange} />
                 <button type="submit" className="btn btn-success w-100" disabled={props.isLoading ? true : false}>Send PW</button>
             </form>
