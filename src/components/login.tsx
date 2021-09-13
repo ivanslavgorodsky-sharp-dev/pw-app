@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import AppProps from './types';
 
-const Login = (props) => {
+const Login = (props: AppProps) => {
   let history = useHistory();
   const [formState, setFormState] = useState({email: "", password: ""});
 
-  const handleSubmit = (evt) => {
+  const handleSubmit = (evt: React.FormEvent) => {
     props.login(formState.email, formState.password)
       .then( token => {
         if (token) {
@@ -18,13 +19,11 @@ const Login = (props) => {
     evt.preventDefault();
   }
 
-  const handleChange = (evt) => {
-    const prop = evt.target.name;
-    const state = {
-      ...formState
-    }
-    state[prop] = evt.target.value;
-    setFormState(state);
+  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setFormState({
+      ...formState,
+      [evt.target.name]: evt.target.value,
+    });
   };
 
   return (

@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import AppProps, { User } from './types';
 
-const NewTransaction = (props) => {
+interface TransactionProps extends AppProps {
+    recipient: string,
+    amount: string,
+}
+
+const NewTransaction = (props: TransactionProps) => {
 
     const [usersFound, setUserFound] = useState([]);
     const [values, setValues] = useState({recipient: "", amount: "", error: ""})
 
     useEffect(() => {
-        setValues({recipient: props.recipient, amount: props.amount});
+        setValues({recipient: props.recipient, amount: props.amount, error: ""});
     }, [props.recipient, props.amount]);
 
-    const handleChange = (evt) => {
+    const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
         if (evt.target.name === "recipient") {
             if (values.recipient !== evt.target.value) {
                 if (evt.target.value.length) {
@@ -20,17 +26,18 @@ const NewTransaction = (props) => {
             }
         }
         if (evt.target.name === "amount") {
-            setValues({...values, "amount": evt.target.value, error: ""})
+            setValues({...values, amount: evt.target.value, error: ""})
         }
     }
-    const handleSubmit = (evt) => {
 
-        if (props.user.balance < values.amount) {
+    const handleSubmit = (evt: React.FormEvent) => {
+
+        if (props.user.balance < parseInt (values.amount)) {
             setValues({...values, "error": "Not enough PW!"})
             return evt.preventDefault();
         }
 
-        props.newTransaction (props.token, values.recipient, values.amount)
+        props.newTransaction (props.token, values.recipient, parseInt (values.amount))
           .then( transaction => {
             //console.log("Transaction sent", transaction);
             setValues({recipient: "", amount: "", error: ""});
@@ -53,7 +60,7 @@ const NewTransaction = (props) => {
                     name="recipient" className="form-control" autoComplete="off" value={values.recipient}
                     list="datalistOptions" placeholder="Type name here" onChange={handleChange} required/>
                 <datalist id="datalistOptions">
-                    { usersFound.map( (item,i) => {
+                    { usersFound.map( (item: User, i: number) => {
                         return <option key={i} value={item.name} />
                     })}
                 </datalist>

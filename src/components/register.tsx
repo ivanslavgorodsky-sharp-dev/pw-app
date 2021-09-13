@@ -1,11 +1,12 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
+import AppProps from './types';
 
-const Register = (props) => {
+const Register = (props: AppProps) => {
   let history = useHistory();
   const [formState, setFormState] = React.useState({name: "", email: "", password1: "", password2: "", error: ""});
 
-  const handleSubmit = (evt) => {
+  const handleSubmit = (evt: React.FormEvent) => {
     if (formState.password1 !== formState.password2) {
       setFormState({
         ...formState,
@@ -26,13 +27,12 @@ const Register = (props) => {
     evt.preventDefault();
   }
 
-  const handleChange = (evt) => {
-    const prop = evt.target.name;
+  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const state = {
       ...formState,
       error: "",
+      [evt.target.name]: evt.target.value,
     }
-    state[prop] = evt.target.value;
     setFormState(state);
   };
 

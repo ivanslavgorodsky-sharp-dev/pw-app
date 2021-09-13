@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import { login, registerUser, userInfo, getTransactions, searchUser, sendPW } from "./services";
-import App from "../App";
+import App from "../App.tsx";
 
 const mapStateToProps = (state) => {
   return {
