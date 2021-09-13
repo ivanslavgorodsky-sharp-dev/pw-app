@@ -1,18 +1,20 @@
 import axios from "axios";
-
 import {
   loginResultSuccess, loginResultFailed, setLoading,
   registerResultSuccess, registerResultFailed,
   userInfoFailed, userInfoSuccess, userTransactionSuccess, userTransactionFailed,
   searchUserFailed, sendPwSuccess, sendPwFailed } from './actions';
 
-var g_baseURL = 'http://193.124.114.46:3001/';
+const AxiosInstance = axios.create({
+  baseURL: 'http://193.124.114.46:3001/',
+  timeout: 1000
+});
 
 export function login(email, password) {
   return dispatch => {
     dispatch(setLoading(true));
-    return axios
-      .post (g_baseURL + 'sessions/create', { email, password })
+    return AxiosInstance
+      .post ('sessions/create', { email, password })
       .then( response => {
         dispatch( loginResultSuccess (response));
         dispatch( setLoading (false));
@@ -27,8 +29,8 @@ export function login(email, password) {
 export function registerUser(username, email, password) {
   return dispatch => {
     dispatch( setLoading (true));
-    return axios
-      .post (g_baseURL + 'users', { username, email, password })
+    return AxiosInstance
+      .post ('users', { username, email, password })
       .then(response => {
         dispatch( registerResultSuccess (response));
         dispatch( setLoading (false));
@@ -43,8 +45,8 @@ export function registerUser(username, email, password) {
 export function userInfo(token) {
   return dispatch => {
     dispatch(setLoading(true));
-    return axios
-      .get (g_baseURL + 'api/protected/user-info', {
+    return AxiosInstance
+      .get ('api/protected/user-info', {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(response => {
@@ -61,8 +63,8 @@ export function userInfo(token) {
 export function getTransactions(token) {
   return dispatch => {
     dispatch(setLoading(true));
-    return axios
-      .get (g_baseURL + 'api/protected/transactions', {
+    return AxiosInstance
+      .get ('api/protected/transactions', {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then (response => {
@@ -79,8 +81,8 @@ export function getTransactions(token) {
 export function searchUser (token, term) {
   return dispatch => {
     dispatch(setLoading(true));
-    return axios
-      .post (g_baseURL + 'api/protected/users/list',
+    return AxiosInstance
+      .post ('api/protected/users/list',
       { filter: term },
       {
         headers: { Authorization: `Bearer ${token}` }
@@ -98,8 +100,8 @@ export function searchUser (token, term) {
 export function sendPW (token, name, amount) {
   return dispatch => {
     dispatch(setLoading(true));
-    return axios
-      .post (g_baseURL + 'api/protected/transactions',
+    return AxiosInstance
+      .post ('api/protected/transactions',
       { name, amount },
       {
         headers: { Authorization: `Bearer ${token}` }

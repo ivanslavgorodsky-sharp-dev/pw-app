@@ -32,12 +32,12 @@ const NewTransaction = (props: TransactionProps) => {
 
     const handleSubmit = (evt: React.FormEvent) => {
 
-        if (props.user.balance < parseInt (values.amount)) {
+        if (props.user.balance < parseFloat (values.amount)) {
             setValues({...values, "error": "Not enough PW!"})
             return evt.preventDefault();
         }
 
-        props.newTransaction (props.token, values.recipient, parseInt (values.amount))
+        props.newTransaction (props.token, values.recipient, parseFloat (values.amount))
           .then( transaction => {
             //console.log("Transaction sent", transaction);
             setValues({recipient: "", amount: "", error: ""});
@@ -65,7 +65,7 @@ const NewTransaction = (props: TransactionProps) => {
                     })}
                 </datalist>
                 <input
-                    name="amount" type="number" step="0.1" autoComplete="off" value={values.amount}
+                    name="amount" type="number" step="0.01" autoComplete="off" value={values.amount}
                     className="form-control" placeholder="Amount" required onChange={handleChange} />
                 <button type="submit" className="btn btn-success w-100" disabled={props.isLoading ? true : false}>Send PW</button>
             </form>
