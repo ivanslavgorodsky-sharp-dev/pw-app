@@ -13,11 +13,12 @@ const Login = (props: AppProps) => {
     },
     validationSchema: Yup.object({
       password: Yup.string()
-        .max(20, 'Must be 20 characters or less')
-        .required('Required'),
+        .required('No password provided.') 
+        .min(3, 'Password is too short - should be 3 chars minimum.')
+        .matches(/[a-zA-Z0-9]/, 'Password can only contain Latin letters and numbers.'),
       email: Yup.string()
         .email('Invalid email address')
-        .required('Required'),
+        .required('Required field.'),
     }),
     onSubmit: values => {
       props.login(formik.values.email, formik.values.password)
