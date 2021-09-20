@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AppProps, { User } from './types';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 interface TransactionProps extends AppProps {
     recipient: string,
@@ -7,66 +9,79 @@ interface TransactionProps extends AppProps {
 }
 
 const NewTransaction = (props: TransactionProps) => {
-
     const [usersFound, setUserFound] = useState([]);
-    const [values, setValues] = useState({recipient: "", amount: "", error: ""})
+    const formik = useFormik({
+        initialValues: {
+            recipient: '',
+            amount: '',
+        },
+        validationSchema: Yup.object({
+        recipient: Yup.string()
+            .required('Recipient is required')
+            .min(3, 'Recipient is too short - should be 3 chars minimum.')
+            .matches(/[a-zA-Z]/, 'Recipient can only contain Latin letters.'),
+        amount: Yup.number()
+            .required('Amount is required')
+            .min(0.01, 'Incorrect amount. min=0.01 PW')
+            .max(props.user.balance, 'Not enough PW')
+        }),
+        onSubmit: values => {
+            props.newTransaction (props.token, formik.values.recipient, parseFloat(formik.values.amount))
+                .then( () => {
+                formik.values.recipient = "";
+                formik.values.amount = "0";
+                props.userInfo (props.token)
+                    .then( user => {
+                        if (user)
+                            props.save ("user", JSON.stringify (user));
+                    });
+                });
+        },
+      });
 
     useEffect(() => {
-        setValues({recipient: props.recipient, amount: props.amount, error: ""});
+        formik.values.recipient = props.recipient;
+        formik.values.amount = props.amount;
+    // eslint-disable-next-line
     }, [props.recipient, props.amount]);
 
     const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-        if (evt.target.name === "recipient") {
-            if (values.recipient !== evt.target.value) {
-                if (evt.target.value.length) {
-                    props.searchUser(props.token, evt.target.value)
-                    .then( userArray => { if (userArray) setUserFound (userArray) });
-                }
-                setValues({...values, "recipient": evt.target.value, error: ""})
+        if (formik.values.recipient !== evt.target.value) {
+            if (evt.target.value.length) {
+                props.searchUser(props.token, evt.target.value)
+                .then( userArray => { if (userArray) setUserFound (userArray) });
             }
+            formik.values.recipient = evt.target.value;
         }
-        if (evt.target.name === "amount") {
-            setValues({...values, amount: evt.target.value, error: ""})
-        }
-    }
-
-    const handleSubmit = (evt: React.FormEvent) => {
-
-        if (props.user.balance < parseFloat (values.amount)) {
-            setValues({...values, "error": "Not enough PW!"})
-            return evt.preventDefault();
-        }
-
-        props.newTransaction (props.token, values.recipient, parseFloat (values.amount))
-          .then( transaction => {
-            //console.log("Transaction sent", transaction);
-            setValues({recipient: "", amount: "", error: ""});
-            props.userInfo (props.token)
-                .then( user => {
-                    if (user)
-                        props.save ("user", JSON.stringify (user));
-                });
-          });
-
-        evt.preventDefault()
     }
 
     return (
         <div className="form-group d-flex justify-content-center align-items-center flex-column p-3">
-            { values.error ? <span className="alert-warning">{values.error}</span> : "" }
-            <form className="content" onSubmit={handleSubmit}>
+            <form className="content" onSubmit={formik.handleSubmit}>
                 <p className="text-center">Make Transaction</p>
                 <input 
-                    name="recipient" className="form-control" autoComplete="off" value={values.recipient}
-                    list="datalistOptions" placeholder="Type name here" onChange={handleChange} required/>
-                <datalist id="datalistOptions">
+                    name="recipient" className="form-control" autoComplete="off"
+                    list="datalistOptions" placeholder="Type name here"
+                    onChange={handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.recipient} />
+                    {formik.touched.recipient && formik.errors.recipient ?
+                    (<div className="alert-warning">{formik.errors.recipient}</div>) : null}
+                    
+                    <datalist id="datalistOptions">
                     { usersFound.map( (item: User, i: number) => {
                         return <option key={i} value={item.name} />
                     })}
-                </datalist>
+                    </datalist>
                 <input
-                    name="amount" type="number" min="0.01" step="0.01" autoComplete="off" value={values.amount}
-                    className="form-control" placeholder="Amount" required onChange={handleChange} />
+                    name="amount" type="number" min="0.01" step="0.01" autoComplete="off"
+                    className="form-control" placeholder="Amount"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.amount} />
+                    {formik.touched.amount && formik.errors.amount ?
+                    (<div className="alert-warning">{formik.errors.amount}</div>) : null}
+
                 <button type="submit" className="btn btn-success w-100" disabled={props.isLoading ? true : false}>Send PW</button>
             </form>
         </div>
